@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    # Local development defaults. Override by env vars in real environments.
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/family_stock}
+    username: ${DB_USERNAME:family_stock_user}
+    password: ${DB_PASSWORD:family_stock_password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    time-zone: UTC
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    # IMPORTANT: Use an environment variable in real environments.
+    # At least 32+ bytes for HMAC SHA-based signing.
+    secret: ${JWT_SECRET:change-me-change-me-change-me-change-me}
+    access-token-ttl-seconds: ${JWT_ACCESS_TOKEN_TTL_SECONDS:3600}

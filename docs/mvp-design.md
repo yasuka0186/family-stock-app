@@ -31,6 +31,12 @@
    - 在庫回復時の扱いを定義
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
+=======
+10. 在庫更新理由（`reason`）の受け取り
+   - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
+   - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
+>>>>>>> theirs
 =======
 10. 在庫更新理由（`reason`）の受け取り
    - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
@@ -135,6 +141,12 @@
 - 制約: `check(current_stock >= 0)`, `check(minimum_stock >= 0)`
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
+=======
+- 重複防止（MVP）: `unique(family_group_id, name)`
+  - 同一家族グループ内で同名アイテム重複を防ぐ
+  - カテゴリ違い・表記ゆれ対応はMVP対象外（将来の正規化で対応）
+>>>>>>> theirs
 =======
 - 重複防止（MVP）: `unique(family_group_id, name)`
   - 同一家族グループ内で同名アイテム重複を防ぐ
@@ -160,10 +172,13 @@
 - `created_at`, `updated_at` (timestamp)
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
 - 重複防止（MVP）:
   - `unique(family_group_id, stock_item_id, status)` を `status='PENDING'` 条件の部分ユニークインデックスで付与
   - `stock_item_id is null` の手動追加は完全重複判定が難しいため、MVPでは同名重複を許容（将来改善）
 =======
+=======
+>>>>>>> theirs
 =======
 >>>>>>> theirs
 - （MVP未採用）`deleted_at` (timestamp, null) または `is_active` による論理削除は将来拡張候補
@@ -176,6 +191,9 @@
   - `BOUGHT` / `SKIPPED` は履歴として残す
   - 一覧APIのデフォルトは `PENDING` 中心で返却（必要に応じてstatus指定で履歴参照）
 <<<<<<< ours
+<<<<<<< ours
+>>>>>>> theirs
+=======
 >>>>>>> theirs
 =======
 >>>>>>> theirs
@@ -189,7 +207,11 @@
 ### 6-4. 自動追加ロジック設計（重要）
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
 1. 在庫更新APIで`stock_items.current_stock`更新
+=======
+1. 在庫更新APIで`stock_items.current_stock`更新（`reason`も受け取る）
+>>>>>>> theirs
 =======
 1. 在庫更新APIで`stock_items.current_stock`更新（`reason`も受け取る）
 >>>>>>> theirs
@@ -204,7 +226,10 @@
 
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
 =======
+=======
+>>>>>>> theirs
 =======
 >>>>>>> theirs
 #### 在庫更新reasonの扱い（MVP）
@@ -213,6 +238,9 @@
 - ただし、在庫更新APIで`reason`を先に受けることで、将来`stock_histories`等を追加する際のAPI破壊的変更を減らす
 
 <<<<<<< ours
+<<<<<<< ours
+>>>>>>> theirs
+=======
 >>>>>>> theirs
 =======
 >>>>>>> theirs
@@ -263,6 +291,7 @@
    - 目的: 在庫数更新（増減・直接設定）
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
    - 入力: `mode(SET|ADD|SUBTRACT), quantity`
    - 挙動: 更新後に低在庫判定し、必要なら買い物リスト自動追加
 
@@ -270,6 +299,8 @@
 10. `GET /api/shopping-list-items`
     - 目的: 買い物リスト一覧（PENDING中心）
 =======
+=======
+>>>>>>> theirs
 =======
 >>>>>>> theirs
    - 入力: `mode(SET|ADD|SUBTRACT), quantity, reason(optional)`
@@ -285,6 +316,9 @@
     - 目的: 買い物リスト一覧（デフォルトはPENDING中心）
     - クエリ: `status`（任意、未指定時は`PENDING`）
 <<<<<<< ours
+<<<<<<< ours
+>>>>>>> theirs
+=======
 >>>>>>> theirs
 =======
 >>>>>>> theirs
@@ -297,6 +331,10 @@
     - 入力: `status(PENDING|BOUGHT|SKIPPED)`
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
+=======
+    - 補足: `BOUGHT` / `SKIPPED`は履歴として保持し、物理削除はMVP必須としない
+>>>>>>> theirs
 =======
     - 補足: `BOUGHT` / `SKIPPED`は履歴として保持し、物理削除はMVP必須としない
 >>>>>>> theirs
@@ -382,7 +420,10 @@
    - 同名・同単位の正規化ルールを導入する時期
 <<<<<<< ours
 <<<<<<< ours
+<<<<<<< ours
 =======
+=======
+>>>>>>> theirs
 =======
 >>>>>>> theirs
 7. stock_items同名制約の運用
@@ -392,6 +433,9 @@
    - `BOUGHT` / `SKIPPED` をどこまで保持するか（MVPは無期限保持）
    - 削除要求が増えた場合に `deleted_at` / `is_active` の導入を検討
 <<<<<<< ours
+<<<<<<< ours
+>>>>>>> theirs
+=======
 >>>>>>> theirs
 =======
 >>>>>>> theirs
