@@ -30,8 +30,7 @@
    - 手動追加との整合性
    - 在庫回復時の扱いを定義
 
-=======
-1.  在庫更新理由（`reason`）の受け取り
+10. 在庫更新理由（`reason`）の受け取り
    - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
    - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
 
@@ -126,13 +125,9 @@
 - `created_by` (FK -> users.id)
 - `created_at`, `updated_at` (timestamp)
 - 制約: `check(current_stock >= 0)`, `check(minimum_stock >= 0)`
-
-
-=======
 - 重複防止（MVP）: `unique(family_group_id, name)`
   - 同一家族グループ内で同名アイテム重複を防ぐ
   - カテゴリ違い・表記ゆれ対応はMVP対象外（将来の正規化で対応）
-=======
 
 #### shopping_list_items
 - `id` (bigserial, PK)
@@ -147,10 +142,6 @@
 - `created_by` (FK -> users.id)
 - `created_at`, `updated_at` (timestamp)
 
-- 重複防止（MVP）:
-  - `unique(family_group_id, stock_item_id, status)` を `status='PENDING'` 条件の部分ユニークインデックスで付与
-  - `stock_item_id is null` の手動追加は完全重複判定が難しいため、MVPでは同名重複を許容（将来改善）
-
 - （MVP未採用）`deleted_at` (timestamp, null) または `is_active` による論理削除は将来拡張候補
 - 重複防止（MVP）:
   - `unique(family_group_id, stock_item_id, status)` を `status='PENDING'` 条件の部分ユニークインデックスで付与
@@ -160,8 +151,6 @@
   - `status` で管理（`PENDING` / `BOUGHT` / `SKIPPED`）
   - `BOUGHT` / `SKIPPED` は履歴として残す
   - 一覧APIのデフォルトは `PENDING` 中心で返却（必要に応じてstatus指定で履歴参照）
-
-
 ### 6-3. リレーション
 - `users` 1 - n `family_memberships` n - 1 `family_groups`
 - `family_groups` 1 - n `stock_items`
@@ -169,8 +158,6 @@
 - `stock_items` 1 - n `shopping_list_items`（手動自由入力時はnull可）
 
 ### 6-4. 自動追加ロジック設計（重要）
-
-=======
 1. 在庫更新APIで`stock_items.current_stock`更新（`reason`も受け取る）
 2. 更新後に`current_stock <= minimum_stock`を判定
 3. trueの場合、`shopping_list_items`にPENDING行があるか確認
@@ -228,7 +215,6 @@
    - 目的: 在庫アイテム編集
 9. `PATCH /api/stock-items/{id}/stock`
    - 目的: 在庫数更新（増減・直接設定）
-
    - 入力: `mode(SET|ADD|SUBTRACT), quantity, reason(optional)`
    - `reason`: `CONSUME` / `PURCHASE` / `ADJUST`
    - 挙動: 更新後に低在庫判定し、必要なら買い物リスト自動追加
@@ -242,11 +228,6 @@
     - 目的: 買い物リスト一覧（デフォルトはPENDING中心）
     - クエリ: `status`（任意、未指定時は`PENDING`）
 
-1.  `POST /api/shopping-list-items`
-    - 目的: 手動追加
-    - 入力: `stockItemId(任意), name, unit, note`
-    - 挙動: `stockItemId`指定時は重複チェック
-2.  `PATCH /api/shopping-list-items/{id}/status`
     - 目的: 状態更新
     - 入力: `status(PENDING|BOUGHT|SKIPPED)`
     - 補足: `BOUGHT` / `SKIPPED`は履歴として保持し、物理削除はMVP必須としない
@@ -333,4 +314,3 @@
 8. 買い物リスト終了データの保持期間
    - `BOUGHT` / `SKIPPED` をどこまで保持するか（MVPは無期限保持）
    - 削除要求が増えた場合に `deleted_at` / `is_active` の導入を検討
-

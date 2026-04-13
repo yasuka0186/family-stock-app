@@ -3,6 +3,9 @@ package com.familystock.backend.exception;
 import com.familystock.backend.dto.response.ErrorResponse;
 import com.familystock.backend.exception.auth.DuplicateEmailException;
 import com.familystock.backend.exception.auth.InvalidCredentialsException;
+import com.familystock.backend.exception.group.AlreadyInGroupException;
+import com.familystock.backend.exception.group.AlreadyMemberException;
+import com.familystock.backend.exception.group.InvalidInviteCodeException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -98,6 +101,80 @@ public class GlobalExceptionHandler {
     }
 
     /**
+
+
+     * 1ユーザー1グループ制約違反を409で返す。
+     * フロントはこのエラーを受けて所属済み画面へ誘導する想定。
+     *
+     * @param ex 所属済み例外
+     * @param request リクエスト情報
+     * @return 統一形式の競合エラーレスポンス
+     */
+    @ExceptionHandler(AlreadyInGroupException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyInGroupException(
+            AlreadyInGroupException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    /**
+     * 同一グループ二重参加を409で返す。
+     *
+     * @param ex 二重参加例外
+     * @param request リクエスト情報
+     * @return 統一形式の競合エラーレスポンス
+     */
+    @ExceptionHandler(AlreadyMemberException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyMemberException(
+            AlreadyMemberException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    /**
+     * 招待コード不正を404で返す。
+     * フロントはコード再入力ガイドに利用できる。
+     *
+     * @param ex 招待コード不正例外
+     * @param request リクエスト情報
+     * @return 統一形式の未検出エラーレスポンス
+     */
+    @ExceptionHandler(InvalidInviteCodeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidInviteCodeException(
+            InvalidInviteCodeException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    /**
+
      * 想定外エラーを500レスポンスとして返す。
      *
      * @param ex 想定外例外
@@ -110,7 +187,10 @@ public class GlobalExceptionHandler {
                 .timestamp(Instant.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+
                 .message(ex.getMessage())
+
+
                 .message("unexpected server error")
                 .path(request.getRequestURI())
                 .build();
