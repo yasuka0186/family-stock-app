@@ -5,6 +5,9 @@ import com.familystock.backend.domain.entity.group.FamilyGroup;
 import com.familystock.backend.domain.entity.group.FamilyMembership;
 import com.familystock.backend.domain.entity.stock.StockItem;
 import com.familystock.backend.domain.entity.shopping.ShoppingListItem;
+import com.familystock.backend.domain.entity.shopping.ShoppingListItem;
+import com.familystock.backend.domain.entity.shopping.type.ShoppingListSourceType;
+import com.familystock.backend.domain.entity.shopping.type.ShoppingListStatus;
 import com.familystock.backend.domain.entity.stock.StockItem;
 import com.familystock.backend.dto.request.StockUpdateRequest;
 import com.familystock.backend.dto.request.stock.StockItemUpsertRequest;
@@ -332,6 +335,8 @@ public class StockItemServiceImpl implements StockItemService {
         shoppingListItem.setUnitSnapshot(stockItem.getUnit());
         shoppingListItem.setStatus("PENDING");
         shoppingListItem.setSourceType("AUTO_LOW_STOCK");
+        shoppingListItem.setStatus(ShoppingListStatus.PENDING.name());
+        shoppingListItem.setSourceType(ShoppingListSourceType.AUTO_LOW_STOCK.name());
         shoppingListItem.setCreatedBy(user);
         shoppingListItem.setCreatedAt(LocalDateTime.now());
         shoppingListItem.setUpdatedAt(LocalDateTime.now());

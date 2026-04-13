@@ -7,11 +7,11 @@ import com.familystock.backend.dto.response.auth.RegisterResponse;
 import com.familystock.backend.dto.response.auth.UserSummaryResponse;
 
 /**
- * 認証ユースケースを扱うサービスの拡張ポイント。
- * TODO: 次フェーズで register/login の業務ロジックを定義する。
+
+ * 認証ユースケースを扱うサービス。
+ * register/login/me の最小業務ロジックを提供する。
  */
 public interface AuthService {
-    // Phase 2: register/login business logic will be added.
     /**
      * 新規ユーザー登録を実行する。
      *

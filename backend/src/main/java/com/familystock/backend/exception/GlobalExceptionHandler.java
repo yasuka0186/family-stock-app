@@ -6,6 +6,8 @@ import com.familystock.backend.exception.auth.InvalidCredentialsException;
 import com.familystock.backend.exception.group.AlreadyInGroupException;
 import com.familystock.backend.exception.group.AlreadyMemberException;
 import com.familystock.backend.exception.group.InvalidInviteCodeException;
+import com.familystock.backend.exception.shopping.InvalidShoppingListRequestException;
+import com.familystock.backend.exception.shopping.ShoppingListItemNotFoundException;
 import com.familystock.backend.exception.stock.DuplicateStockItemException;
 import com.familystock.backend.exception.stock.GroupMembershipRequiredException;
 import com.familystock.backend.exception.stock.InvalidStockUpdateOperationException;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     /**
      * バリデーションエラーを400レスポンスとして返す。
      *
@@ -269,6 +272,54 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * 買い物リストの業務バリデーションエラーを400で返す。
+     * フロントは入力補正メッセージとして扱える。
+     *
+     * @param ex 買い物リスト入力不正例外
+     * @param request リクエスト情報
+     * @return 統一形式のバッドリクエストレスポンス
+     */
+    @ExceptionHandler(InvalidShoppingListRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidShoppingListRequestException(
+            InvalidShoppingListRequestException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * 買い物リスト項目未存在エラーを404で返す。
+     * 他グループ境界アクセス時も同一応答にして情報露出を抑える。
+     *
+     * @param ex 買い物リスト未存在例外
+     * @param request リクエスト情報
+     * @return 統一形式の未検出レスポンス
+     */
+    @ExceptionHandler(ShoppingListItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleShoppingListItemNotFoundException(
+            ShoppingListItemNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     /**

@@ -232,7 +232,6 @@
     - 入力: `stockItemId(任意), name, unit, note`
     - 挙動: `stockItemId`指定時は重複チェック
 12. `PATCH /api/shopping-list-items/{id}/status`
-
     - 目的: 状態更新
     - 入力: `status(PENDING|BOUGHT|SKIPPED)`
     - 補足: `BOUGHT` / `SKIPPED`は履歴として保持し、物理削除はMVP必須としない
