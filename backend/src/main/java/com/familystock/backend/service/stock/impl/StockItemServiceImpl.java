@@ -4,6 +4,9 @@ import com.familystock.backend.domain.entity.User;
 import com.familystock.backend.domain.entity.group.FamilyGroup;
 import com.familystock.backend.domain.entity.group.FamilyMembership;
 import com.familystock.backend.domain.entity.stock.StockItem;
+import com.familystock.backend.domain.entity.shopping.ShoppingListItem;
+import com.familystock.backend.domain.entity.stock.StockItem;
+import com.familystock.backend.dto.request.StockUpdateRequest;
 import com.familystock.backend.dto.request.stock.StockItemUpsertRequest;
 import com.familystock.backend.dto.response.stock.StockItemResponse;
 import com.familystock.backend.exception.auth.InvalidCredentialsException;
@@ -12,6 +15,11 @@ import com.familystock.backend.exception.stock.GroupMembershipRequiredException;
 import com.familystock.backend.exception.stock.StockItemNotFoundException;
 import com.familystock.backend.repository.UserRepository;
 import com.familystock.backend.repository.group.FamilyMembershipRepository;
+import com.familystock.backend.exception.stock.InvalidStockUpdateOperationException;
+import com.familystock.backend.exception.stock.StockItemNotFoundException;
+import com.familystock.backend.repository.UserRepository;
+import com.familystock.backend.repository.group.FamilyMembershipRepository;
+import com.familystock.backend.repository.shopping.ShoppingListItemRepository;
 import com.familystock.backend.repository.stock.StockItemRepository;
 import com.familystock.backend.service.stock.StockItemService;
 import java.time.LocalDateTime;
@@ -31,6 +39,7 @@ public class StockItemServiceImpl implements StockItemService {
     private final UserRepository userRepository;
     private final FamilyMembershipRepository familyMembershipRepository;
     private final StockItemRepository stockItemRepository;
+    private final ShoppingListItemRepository shoppingListItemRepository;
 
     /**
      * 所属グループの在庫一覧を取得する。
@@ -158,6 +167,40 @@ public class StockItemServiceImpl implements StockItemService {
     }
 
     /**
+     * 在庫数を更新する専用処理。
+     * CRUD更新と責務を分離し、数量変動に伴う低在庫判定ロジックを集中管理する。
+     *
+     * @param userEmail JWT subjectとして扱うユーザーメール
+     * @param stockItemId 更新対象在庫ID
+     * @param request 更新モード・数量・理由
+     * @return 更新後在庫情報
+     */
+    @Override
+    @Transactional
+    public StockItemResponse updateStockQuantity(String userEmail, Long stockItemId, StockUpdateRequest request) {
+        User user = findUserByEmail(userEmail);
+        FamilyGroup familyGroup = findUserGroupOrThrow(user.getId());
+
+        StockItem stockItem = stockItemRepository.findByIdAndFamilyGroupIdAndIsActiveTrue(stockItemId, familyGroup.getId())
+                .orElseThrow(() -> new StockItemNotFoundException("stock item not found"));
+
+        int updatedStock = calculateUpdatedStock(stockItem.getCurrentStock(), request);
+        stockItem.setCurrentStock(updatedStock);
+        stockItem.setUpdatedAt(LocalDateTime.now());
+
+        // TODO: 後続フェーズで在庫履歴テーブルを導入し、reasonを履歴保存する。
+        // MVPではAPI互換を先に確保し、保存処理は最小化する。
+
+        if (isLowStock(stockItem)) {
+            addShoppingListItemIfMissing(stockItem, user);
+        }
+        // 在庫回復時に自動クローズしない方針:
+        // PENDINGの購買判断はユーザー主導にし、意図しない削除を防ぐ。
+
+        return toResponse(stockItem);
+    }
+
+    /**
      * 認証ユーザーを取得する。
      *
      * @param userEmail JWT subjectとして扱うメール
@@ -242,6 +285,58 @@ public class StockItemServiceImpl implements StockItemService {
      */
     private boolean isLowStock(StockItem stockItem) {
         return stockItem.getCurrentStock() <= stockItem.getMinimumStock();
+    }
+
+    /**
+     * 更新モードに応じて更新後在庫数を計算する。
+     * SUBTRACTで負数になるケースは業務上不正として拒否する。
+     *
+     * @param currentStock 現在在庫
+     * @param request 更新要求
+     * @return 更新後在庫
+     */
+    private int calculateUpdatedStock(int currentStock, StockUpdateRequest request) {
+        return switch (request.getMode()) {
+            case SET -> request.getQuantity();
+            case ADD -> currentStock + request.getQuantity();
+            case SUBTRACT -> {
+                int result = currentStock - request.getQuantity();
+                if (result < 0) {
+                    throw new InvalidStockUpdateOperationException("stock cannot be negative");
+                }
+                yield result;
+            }
+        };
+    }
+
+    /**
+     * 低在庫時に買い物リストへ自動追加する。
+     * 既存PENDINGがある場合は重複追加せず何もしない。
+     *
+     * @param stockItem 判定対象在庫
+     * @param user 操作ユーザー
+     */
+    private void addShoppingListItemIfMissing(StockItem stockItem, User user) {
+        boolean existsPending = shoppingListItemRepository.existsPendingByFamilyGroupIdAndStockItemId(
+                stockItem.getFamilyGroup().getId(),
+                stockItem.getId()
+        );
+        if (existsPending) {
+            return;
+        }
+
+        ShoppingListItem shoppingListItem = new ShoppingListItem();
+        shoppingListItem.setFamilyGroup(stockItem.getFamilyGroup());
+        shoppingListItem.setStockItem(stockItem);
+        shoppingListItem.setNameSnapshot(stockItem.getName());
+        shoppingListItem.setUnitSnapshot(stockItem.getUnit());
+        shoppingListItem.setStatus("PENDING");
+        shoppingListItem.setSourceType("AUTO_LOW_STOCK");
+        shoppingListItem.setCreatedBy(user);
+        shoppingListItem.setCreatedAt(LocalDateTime.now());
+        shoppingListItem.setUpdatedAt(LocalDateTime.now());
+
+        shoppingListItemRepository.save(shoppingListItem);
     }
 
     /**

@@ -8,6 +8,7 @@ import com.familystock.backend.exception.group.AlreadyMemberException;
 import com.familystock.backend.exception.group.InvalidInviteCodeException;
 import com.familystock.backend.exception.stock.DuplicateStockItemException;
 import com.familystock.backend.exception.stock.GroupMembershipRequiredException;
+import com.familystock.backend.exception.stock.InvalidStockUpdateOperationException;
 import com.familystock.backend.exception.stock.StockItemNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
@@ -244,6 +245,30 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    /**
+     * 不正な在庫更新操作を400で返す。
+     * フロントは入力値再確認を促すUIへ遷移できる。
+     *
+     * @param ex 在庫更新不正例外
+     * @param request リクエスト情報
+     * @return 統一形式のバッドリクエストレスポンス
+     */
+    @ExceptionHandler(InvalidStockUpdateOperationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStockUpdateOperationException(
+            InvalidStockUpdateOperationException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     /**

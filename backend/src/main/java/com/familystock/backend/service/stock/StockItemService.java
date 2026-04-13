@@ -2,6 +2,7 @@ package com.familystock.backend.service.stock;
 
 import com.familystock.backend.dto.request.stock.StockItemUpsertRequest;
 import com.familystock.backend.dto.response.stock.StockItemResponse;
+import com.familystock.backend.dto.request.StockUpdateRequest;
 import java.util.List;
 
 /**
@@ -53,4 +54,15 @@ public interface StockItemService {
      * @param stockItemId 削除対象ID
      */
     void deleteStockItem(String userEmail, Long stockItemId);
+
+    /**
+     * 在庫数更新専用APIの業務ロジックを実行する。
+     * 更新後に低在庫判定を行い、必要に応じて買い物リストへ自動追加する。
+     *
+     * @param userEmail JWT subjectとして扱うユーザーメール
+     * @param stockItemId 更新対象在庫ID
+     * @param request 更新モード・数量・理由
+     * @return 更新後在庫情報
+     */
+    StockItemResponse updateStockQuantity(String userEmail, Long stockItemId, StockUpdateRequest request);
 }

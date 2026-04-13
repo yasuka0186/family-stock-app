@@ -1,6 +1,7 @@
 package com.familystock.backend.controller;
 
 import com.familystock.backend.dto.request.stock.StockItemUpsertRequest;
+import com.familystock.backend.dto.request.StockUpdateRequest;
 import com.familystock.backend.dto.response.stock.StockItemResponse;
 import com.familystock.backend.service.stock.StockItemService;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,5 +107,24 @@ public class StockItemController {
     public ResponseEntity<Void> deleteStockItem(Authentication authentication, @PathVariable Long id) {
         stockItemService.deleteStockItem(authentication.getName(), id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 在庫数を更新する専用API。
+     * 基本情報更新と責務を分離し、低在庫判定と自動追加ロジックを扱いやすくする。
+     *
+     * @param authentication JWT認証済みユーザー
+     * @param id 更新対象在庫ID
+     * @param request 更新モード・数量・理由
+     * @return 更新後在庫情報
+     */
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<StockItemResponse> updateStockQuantity(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StockUpdateRequest request
+    ) {
+        StockItemResponse response = stockItemService.updateStockQuantity(authentication.getName(), id, request);
+        return ResponseEntity.ok(response);
     }
 }
