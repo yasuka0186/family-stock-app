@@ -29,7 +29,6 @@
    - 重複防止
    - 手動追加との整合性
    - 在庫回復時の扱いを定義
-
 10. 在庫更新理由（`reason`）の受け取り
    - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
    - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
@@ -141,7 +140,6 @@
 - `note` (varchar 255, null)
 - `created_by` (FK -> users.id)
 - `created_at`, `updated_at` (timestamp)
-
 - （MVP未採用）`deleted_at` (timestamp, null) または `is_active` による論理削除は将来拡張候補
 - 重複防止（MVP）:
   - `unique(family_group_id, stock_item_id, status)` を `status='PENDING'` 条件の部分ユニークインデックスで付与
@@ -151,6 +149,7 @@
   - `status` で管理（`PENDING` / `BOUGHT` / `SKIPPED`）
   - `BOUGHT` / `SKIPPED` は履歴として残す
   - 一覧APIのデフォルトは `PENDING` 中心で返却（必要に応じてstatus指定で履歴参照）
+
 ### 6-3. リレーション
 - `users` 1 - n `family_memberships` n - 1 `family_groups`
 - `family_groups` 1 - n `stock_items`
@@ -227,6 +226,12 @@
 10. `GET /api/shopping-list-items`
     - 目的: 買い物リスト一覧（デフォルトはPENDING中心）
     - クエリ: `status`（任意、未指定時は`PENDING`）
+
+11. `POST /api/shopping-list-items`
+    - 目的: 手動追加
+    - 入力: `stockItemId(任意), name, unit, note`
+    - 挙動: `stockItemId`指定時は重複チェック
+12. `PATCH /api/shopping-list-items/{id}/status`
 
     - 目的: 状態更新
     - 入力: `status(PENDING|BOUGHT|SKIPPED)`

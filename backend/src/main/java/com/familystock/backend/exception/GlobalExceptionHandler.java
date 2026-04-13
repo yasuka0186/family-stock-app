@@ -6,6 +6,9 @@ import com.familystock.backend.exception.auth.InvalidCredentialsException;
 import com.familystock.backend.exception.group.AlreadyInGroupException;
 import com.familystock.backend.exception.group.AlreadyMemberException;
 import com.familystock.backend.exception.group.InvalidInviteCodeException;
+import com.familystock.backend.exception.stock.DuplicateStockItemException;
+import com.familystock.backend.exception.stock.GroupMembershipRequiredException;
+import com.familystock.backend.exception.stock.StockItemNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -101,8 +104,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-
-
      * 1ユーザー1グループ制約違反を409で返す。
      * フロントはこのエラーを受けて所属済み画面へ誘導する想定。
      *
@@ -174,6 +175,78 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * グループ未所属ユーザーの在庫操作を403で返す。
+     * 在庫はグループ単位のため、未所属状態でのアクセスを明示的に拒否する。
+     *
+     * @param ex グループ未所属例外
+     * @param request リクエスト情報
+     * @return 統一形式の認可エラーレスポンス
+     */
+    @ExceptionHandler(GroupMembershipRequiredException.class)
+    public ResponseEntity<ErrorResponse> handleGroupMembershipRequiredException(
+            GroupMembershipRequiredException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    /**
+     * 在庫未存在エラーを404で返す。
+     * 他グループ越境アクセスも同じ404に寄せ、情報漏えいを防ぐ。
+     *
+     * @param ex 在庫未存在例外
+     * @param request リクエスト情報
+     * @return 統一形式の未検出エラーレスポンス
+     */
+    @ExceptionHandler(StockItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleStockItemNotFoundException(
+            StockItemNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    /**
+     * 同名在庫重複エラーを409で返す。
+     * フロントは同名入力の見直し案内に利用できる。
+     *
+     * @param ex 同名重複例外
+     * @param request リクエスト情報
+     * @return 統一形式の競合エラーレスポンス
+     */
+    @ExceptionHandler(DuplicateStockItemException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateStockItemException(
+            DuplicateStockItemException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    /**
 
      * 想定外エラーを500レスポンスとして返す。
      *
@@ -187,10 +260,7 @@ public class GlobalExceptionHandler {
                 .timestamp(Instant.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-
                 .message(ex.getMessage())
-
-
                 .message("unexpected server error")
                 .path(request.getRequestURI())
                 .build();
