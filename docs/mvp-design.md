@@ -30,27 +30,12 @@
    - 手動追加との整合性
    - 在庫回復時の扱いを定義
 
-<<<<<<< ours
 =======
 1.  在庫更新理由（`reason`）の受け取り
    - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
    - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
->>>>>>> theirs
+
 =======
-1.  在庫更新理由（`reason`）の受け取り
-   - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
-   - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
->>>>>>> theirs
-=======
-1.  在庫更新理由（`reason`）の受け取り
-   - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
-   - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
->>>>>>> theirs
-=======
-1.  在庫更新理由（`reason`）の受け取り
-   - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
-   - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
->>>>>>> theirs
 
 ### 2-2. あればよい機能（MVP+1候補）
 - 在庫一覧の簡易フィルタ（カテゴリ / 在庫不足のみ）
@@ -163,7 +148,7 @@
 - `note` (varchar 255, null)
 - `created_by` (FK -> users.id)
 - `created_at`, `updated_at` (timestamp)
-<<<<<<< ours
+
 
 - 重複防止（MVP）:
   - `unique(family_group_id, stock_item_id, status)` を `status='PENDING'` 条件の部分ユニークインデックスで付与
@@ -188,8 +173,6 @@
 
 ### 6-4. 自動追加ロジック設計（重要）
 
-
-
 =======
 1. 在庫更新APIで`stock_items.current_stock`更新（`reason`も受け取る）
 
@@ -198,7 +181,6 @@
    - 対象: `family_group_id + stock_item_id + status=PENDING`
 4. なければ`source_type=AUTO_LOW_STOCK`で1件追加
 5. あれば何もしない（重複防止）
-
 
 #### 在庫更新reasonの扱い（MVP）
 - 受け付ける値: `CONSUME` / `PURCHASE` / `ADJUST`（optional）
@@ -251,14 +233,6 @@
 9. `PATCH /api/stock-items/{id}/stock`
    - 目的: 在庫数更新（増減・直接設定）
 
-   - 入力: `mode(SET|ADD|SUBTRACT), quantity`
-   - 挙動: 更新後に低在庫判定し、必要なら買い物リスト自動追加
-
-### 買い物リスト
-10. `GET /api/shopping-list-items`
-    - 目的: 買い物リスト一覧（PENDING中心）
-
-
    - 入力: `mode(SET|ADD|SUBTRACT), quantity, reason(optional)`
    - `reason`: `CONSUME` / `PURCHASE` / `ADJUST`
    - 挙動: 更新後に低在庫判定し、必要なら買い物リスト自動追加
@@ -272,7 +246,6 @@
     - 目的: 買い物リスト一覧（デフォルトはPENDING中心）
     - クエリ: `status`（任意、未指定時は`PENDING`）
 
-=======
 
 1.  `POST /api/shopping-list-items`
     - 目的: 手動追加
@@ -281,8 +254,6 @@
 2.  `PATCH /api/shopping-list-items/{id}/status`
     - 目的: 状態更新
     - 入力: `status(PENDING|BOUGHT|SKIPPED)`
-
-=======
     - 補足: `BOUGHT` / `SKIPPED`は履歴として保持し、物理削除はMVP必須としない
 
 
