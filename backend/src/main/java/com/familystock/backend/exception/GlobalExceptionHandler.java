@@ -323,7 +323,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-
      * 想定外エラーを500レスポンスとして返す。
      *
      * @param ex 想定外例外
@@ -336,7 +335,6 @@ public class GlobalExceptionHandler {
                 .timestamp(Instant.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .message(ex.getMessage())
                 .message("unexpected server error")
                 .path(request.getRequestURI())
                 .build();

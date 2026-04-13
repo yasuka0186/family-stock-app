@@ -12,6 +12,7 @@ import com.familystock.backend.dto.response.auth.UserSummaryResponse;
  * register/login/me の最小業務ロジックを提供する。
  */
 public interface AuthService {
+
     /**
      * 新規ユーザー登録を実行する。
      *

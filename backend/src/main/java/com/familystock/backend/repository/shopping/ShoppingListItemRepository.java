@@ -39,7 +39,6 @@ public interface ShoppingListItemRepository extends JpaRepository<ShoppingListIt
     Optional<ShoppingListItem> findByIdAndFamilyGroupId(Long id, Long familyGroupId);
 
     /**
-
      * 同一stockItemに対するPENDING項目の存在確認を行う。
      * MANUAL / AUTO_LOW_STOCK を区別せず、重複を抑止するために利用する。
      *
@@ -72,5 +71,4 @@ public interface ShoppingListItemRepository extends JpaRepository<ShoppingListIt
             Long stockItemId,
             String status
     );
-
 }

@@ -226,7 +226,6 @@
 10. `GET /api/shopping-list-items`
     - 目的: 買い物リスト一覧（デフォルトはPENDING中心）
     - クエリ: `status`（任意、未指定時は`PENDING`）
-
 11. `POST /api/shopping-list-items`
     - 目的: 手動追加
     - 入力: `stockItemId(任意), name, unit, note`
