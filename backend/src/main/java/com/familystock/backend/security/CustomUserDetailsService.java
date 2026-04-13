@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
  * Spring Security向けのユーザー取得サービス。
  * MVPではメールアドレスをログインIDとして扱う前提に合わせる。
  */
-
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
@@ -28,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username)
+        User user = userRepository.findByEmail(username.trim().toLowerCase())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return org.springframework.security.core.userdetails.User

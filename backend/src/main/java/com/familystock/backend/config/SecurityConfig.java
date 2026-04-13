@@ -1,10 +1,12 @@
 package com.familystock.backend.config;
 
 import com.familystock.backend.security.JwtAuthenticationFilter;
+import com.familystock.backend.security.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,7 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 認証・認可の基本設定を管理するクラス。
  * MVPではJWTベースのStateless構成に限定し、実装をシンプルに保つ。
  */
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -28,6 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     /**
      * HTTPセキュリティ設定を定義する。
@@ -37,15 +39,17 @@ public class SecurityConfig {
      * @return 構築済みSecurityFilterChain
      * @throws Exception セキュリティ設定の構築失敗時
      */
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/health", "/api/auth/**").permitAll()
+                        .requestMatchers("/api/health").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -59,7 +63,6 @@ public class SecurityConfig {
      *
      * @return BCryptベースのPasswordEncoder
      */
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

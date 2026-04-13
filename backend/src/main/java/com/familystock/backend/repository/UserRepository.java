@@ -16,6 +16,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param email 検索対象メールアドレス
      * @return 該当ユーザー（存在しない場合は空）
      */
-
     Optional<User> findByEmail(String email);
 }

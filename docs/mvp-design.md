@@ -35,8 +35,6 @@
    - `CONSUME` / `PURCHASE` / `ADJUST`（任意入力）
    - MVPでは履歴テーブル未導入だが、将来の在庫履歴機能に拡張しやすい入力を先行定義
 
-=======
-
 ### 2-2. あればよい機能（MVP+1候補）
 - 在庫一覧の簡易フィルタ（カテゴリ / 在庫不足のみ）
 - 買い物リストの購入済みチェック
@@ -129,12 +127,12 @@
 - `created_at`, `updated_at` (timestamp)
 - 制約: `check(current_stock >= 0)`, `check(minimum_stock >= 0)`
 
+
 =======
 - 重複防止（MVP）: `unique(family_group_id, name)`
   - 同一家族グループ内で同名アイテム重複を防ぐ
   - カテゴリ違い・表記ゆれ対応はMVP対象外（将来の正規化で対応）
 =======
-
 
 #### shopping_list_items
 - `id` (bigserial, PK)
@@ -148,7 +146,6 @@
 - `note` (varchar 255, null)
 - `created_by` (FK -> users.id)
 - `created_at`, `updated_at` (timestamp)
-
 
 - 重複防止（MVP）:
   - `unique(family_group_id, stock_item_id, status)` を `status='PENDING'` 条件の部分ユニークインデックスで付与
@@ -175,7 +172,6 @@
 
 =======
 1. 在庫更新APIで`stock_items.current_stock`更新（`reason`も受け取る）
-
 2. 更新後に`current_stock <= minimum_stock`を判定
 3. trueの場合、`shopping_list_items`にPENDING行があるか確認
    - 対象: `family_group_id + stock_item_id + status=PENDING`
@@ -246,7 +242,6 @@
     - 目的: 買い物リスト一覧（デフォルトはPENDING中心）
     - クエリ: `status`（任意、未指定時は`PENDING`）
 
-
 1.  `POST /api/shopping-list-items`
     - 目的: 手動追加
     - 入力: `stockItemId(任意), name, unit, note`
@@ -255,7 +250,6 @@
     - 目的: 状態更新
     - 入力: `status(PENDING|BOUGHT|SKIPPED)`
     - 補足: `BOUGHT` / `SKIPPED`は履歴として保持し、物理削除はMVP必須としない
-
 
 ## 8. ディレクトリ構成案
 
@@ -333,7 +327,6 @@
    - 在庫回復時に自動クローズするか（MVPではしない）
 6. 手動自由入力アイテムの重複判定
    - 同名・同単位の正規化ルールを導入する時期
-
 7. stock_items同名制約の運用
    - `unique(family_group_id, name)`採用時の表記ゆれ（例: `トマト` / `とまと`）対応方針
    - MVPではアプリ側バリデーション + DB一意制約で簡易対応し、正規化・別名管理は将来対応
