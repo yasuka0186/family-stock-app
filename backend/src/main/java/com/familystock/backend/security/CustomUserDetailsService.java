@@ -8,12 +8,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * Spring Security向けのユーザー取得サービス。
+ * MVPではメールアドレスをログインIDとして扱う前提に合わせる。
+ */
+
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * ユーザー名（=メールアドレス）から認証用ユーザー情報を生成する。
+     *
+     * @param username メールアドレス
+     * @return Spring SecurityのUserDetails
+     * @throws UsernameNotFoundException 該当ユーザーが存在しない場合
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username)

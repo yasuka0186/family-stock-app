@@ -15,6 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * 認証・認可の基本設定を管理するクラス。
+ * MVPではJWTベースのStateless構成に限定し、実装をシンプルに保つ。
+ */
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -23,6 +28,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    /**
+     * HTTPセキュリティ設定を定義する。
+     * 認証不要パスを最小限に限定し、それ以外はJWT認証必須にする。
+     *
+     * @param http Spring SecurityのHTTP設定オブジェクト
+     * @return 構築済みSecurityFilterChain
+     * @throws Exception セキュリティ設定の構築失敗時
+     */
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,6 +52,13 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    /**
+     * パスワードのハッシュ化戦略を定義する。
+     * Spring標準で実績のあるBCryptを採用し、Auth機能実装時の安全性を担保する。
+     *
+     * @return BCryptベースのPasswordEncoder
+     */
 
     @Bean
     public PasswordEncoder passwordEncoder() {

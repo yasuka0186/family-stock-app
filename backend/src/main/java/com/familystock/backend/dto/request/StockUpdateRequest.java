@@ -7,6 +7,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 在庫更新APIのリクエストDTO。
+ * reasonを先行導入することで、将来の在庫履歴機能追加時の破壊的変更を避ける。
+ */
 @Getter
 @Setter
 public class StockUpdateRequest {

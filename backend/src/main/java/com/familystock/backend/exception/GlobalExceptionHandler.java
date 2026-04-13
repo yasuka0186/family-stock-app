@@ -12,8 +12,19 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * API全体の例外レスポンスを統一するハンドラ。
+ * 実装初期からエラー形式を固定し、フロントとの結合を安定させる。
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    /**
+     * バリデーションエラーを400レスポンスとして返す。
+     *
+     * @param ex バリデーション例外
+     * @param request リクエスト情報
+     * @return 統一形式のバリデーションエラーレスポンス
+     */
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
@@ -37,6 +48,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    /**
+     * 想定外エラーを500レスポンスとして返す。
+     *
+     * @param ex 想定外例外
+     * @param request リクエスト情報
+     * @return 統一形式のサーバーエラーレスポンス
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception ex, HttpServletRequest request) {
         ErrorResponse response = ErrorResponse.builder()

@@ -13,6 +13,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * リクエストごとにJWTを検証し、SecurityContextへ認証情報を設定するフィルタ。
+ * 認証不要パス以外でのアクセス制御をシンプルに実現する。
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -20,6 +24,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService userDetailsService;
 
+    /**
+     * AuthorizationヘッダーのBearerトークンを検証し、認証情報を設定する。
+     *
+     * @param request HTTPリクエスト
+     * @param response HTTPレスポンス
+     * @param filterChain 後続フィルタチェーン
+     * @throws ServletException サーブレット処理例外
+     * @throws IOException I/O例外
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,

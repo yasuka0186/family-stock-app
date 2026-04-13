@@ -11,6 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * ユーザー情報を保持するエンティティ。
+ * 認証の起点となるメールアドレスとパスワードハッシュを管理する。
+ */
 @Getter
 @Setter
 @NoArgsConstructor

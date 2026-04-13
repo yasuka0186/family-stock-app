@@ -5,6 +5,10 @@ import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * APIエラーレスポンスの共通フォーマット。
+ * フロントエンドが一貫した形式でエラーを扱えるようにする。
+ */
 @Getter
 @Builder
 public class ErrorResponse {
