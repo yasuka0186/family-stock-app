@@ -22,10 +22,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGroupStore } from '../stores/group'
-<<<<<<< ours
-=======
 import { getErrorMessage } from '../utils/error'
->>>>>>> theirs
 
 /**
  * グループ作成/参加画面。
@@ -39,10 +36,9 @@ const error = ref('')
 
 onMounted(async () => {
   try {
-<<<<<<< ours
-=======
+
     // 既所属ユーザーが誤って来た場合は即座に在庫画面へ戻す。
->>>>>>> theirs
+
     await groupStore.fetchMyGroup()
     if (groupStore.hasGroup) {
       router.push('/stocks')
@@ -57,13 +53,9 @@ async function createGroup() {
   try {
     await groupStore.createGroup(groupName.value)
     router.push('/stocks')
-<<<<<<< ours
+
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? 'グループ作成に失敗しました'
-=======
-  } catch (e: unknown) {
-    error.value = getErrorMessage(e, 'グループ作成に失敗しました')
->>>>>>> theirs
   }
 }
 
@@ -72,13 +64,10 @@ async function joinGroup() {
   try {
     await groupStore.joinGroup(inviteCode.value)
     router.push('/stocks')
-<<<<<<< ours
+
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? 'グループ参加に失敗しました'
-=======
-  } catch (e: unknown) {
-    error.value = getErrorMessage(e, 'グループ参加に失敗しました')
->>>>>>> theirs
+
   }
 }
 </script>

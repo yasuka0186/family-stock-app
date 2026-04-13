@@ -33,10 +33,7 @@ import AppLayout from '../layouts/AppLayout.vue'
 import { stockApi } from '../api/stock'
 import type { StockItem } from '../types/stock'
 import StockQuantityUpdater from '../components/StockQuantityUpdater.vue'
-<<<<<<< ours
-=======
 import { getErrorMessage } from '../utils/error'
->>>>>>> theirs
 
 /**
  * 在庫一覧画面。
@@ -48,27 +45,21 @@ const error = ref('')
 
 onMounted(load)
 
-<<<<<<< ours
-=======
+
+
 /**
  * 一覧再取得処理。
  * 在庫更新・削除後にサーバー基準の状態へ揃えるため、都度再フェッチする。
  */
->>>>>>> theirs
+
 async function load() {
   error.value = ''
   try {
     const { data } = await stockApi.list(lowStockOnly.value)
     items.value = data
-<<<<<<< ours
+
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '在庫取得に失敗しました'
-  }
-}
-
-=======
-  } catch (e: unknown) {
-    error.value = getErrorMessage(e, '在庫取得に失敗しました')
   }
 }
 
@@ -76,19 +67,15 @@ async function load() {
  * 在庫削除処理。
  * 削除後は一覧を再取得し、数量更新など他操作と表示整合を保つ。
  */
->>>>>>> theirs
+
 async function remove(id: number) {
   if (!confirm('削除しますか？')) return
   try {
     await stockApi.remove(id)
     await load()
-<<<<<<< ours
+
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '削除に失敗しました'
-=======
-  } catch (e: unknown) {
-    error.value = getErrorMessage(e, '削除に失敗しました')
->>>>>>> theirs
   }
 }
 </script>

@@ -54,10 +54,7 @@ import { shoppingApi } from '../api/shopping'
 import { stockApi } from '../api/stock'
 import type { ShoppingListItem, ShoppingListStatus } from '../types/shopping'
 import type { StockItem } from '../types/stock'
-<<<<<<< ours
-=======
 import { getErrorMessage } from '../utils/error'
->>>>>>> theirs
 
 /**
  * 買い物リスト画面。
@@ -80,26 +77,22 @@ onMounted(async () => {
   await Promise.all([loadItems(), loadStockItems()])
 })
 
-<<<<<<< ours
-=======
+
+
 /**
  * 買い物リスト読み込み。
  * 更新直後の表示ずれを防ぐため、状態変更後もこの関数で再取得する。
  */
->>>>>>> theirs
+
 async function loadItems() {
   error.value = ''
   try {
     const status = (statusFilter.value || undefined) as ShoppingListStatus | undefined
     const { data } = await shoppingApi.list(status)
     items.value = data
-<<<<<<< ours
+
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '買い物リスト取得に失敗しました'
-=======
-  } catch (e: unknown) {
-    error.value = getErrorMessage(e, '買い物リスト取得に失敗しました')
->>>>>>> theirs
   }
 }
 
@@ -112,13 +105,13 @@ async function loadStockItems() {
   }
 }
 
-<<<<<<< ours
-=======
+
+
 /**
  * 手動追加処理。
  * 在庫紐付けあり/なしの両方を同一フォームで扱い、MVP導線を単純化する。
  */
->>>>>>> theirs
+
 async function createItem() {
   error.value = ''
   createMessage.value = ''
@@ -138,15 +131,9 @@ async function createItem() {
     const { data } = await shoppingApi.create(payload)
     createMessage.value = data.created ? '追加しました' : 'すでにPENDINGが存在するため既存を表示しました'
     await loadItems()
-<<<<<<< ours
+
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '手動追加に失敗しました'
-  }
-}
-
-=======
-  } catch (e: unknown) {
-    error.value = getErrorMessage(e, '手動追加に失敗しました')
   }
 }
 
@@ -154,19 +141,15 @@ async function createItem() {
  * 状態更新処理。
  * 画面側は操作結果の反映までを責務とし、業務整合はバックエンドに委譲する。
  */
->>>>>>> theirs
+
 async function updateStatus(id: number, status: ShoppingListStatus) {
   error.value = ''
   try {
     await shoppingApi.updateStatus(id, { status })
     await loadItems()
-<<<<<<< ours
+
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '状態更新に失敗しました'
-=======
-  } catch (e: unknown) {
-    error.value = getErrorMessage(e, '状態更新に失敗しました')
->>>>>>> theirs
   }
 }
 </script>
