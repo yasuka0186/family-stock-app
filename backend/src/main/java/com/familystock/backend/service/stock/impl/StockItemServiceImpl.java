@@ -333,8 +333,11 @@ public class StockItemServiceImpl implements StockItemService {
         shoppingListItem.setStockItem(stockItem);
         shoppingListItem.setNameSnapshot(stockItem.getName());
         shoppingListItem.setUnitSnapshot(stockItem.getUnit());
+
         shoppingListItem.setStatus("PENDING");
         shoppingListItem.setSourceType("AUTO_LOW_STOCK");
+
+
         shoppingListItem.setStatus(ShoppingListStatus.PENDING.name());
         shoppingListItem.setSourceType(ShoppingListSourceType.AUTO_LOW_STOCK.name());
         shoppingListItem.setCreatedBy(user);

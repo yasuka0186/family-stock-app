@@ -29,6 +29,10 @@ import { useRoute, useRouter } from 'vue-router'
 import AppLayout from '../layouts/AppLayout.vue'
 import { stockApi } from '../api/stock'
 import type { StockItemForm } from '../types/stock'
+<<<<<<< ours
+=======
+import { getErrorMessage } from '../utils/error'
+>>>>>>> theirs
 
 /**
  * 在庫作成/編集画面。
@@ -51,17 +55,33 @@ const isEdit = computed(() => Boolean(route.params.id))
 onMounted(async () => {
   if (!isEdit.value) return
   try {
+<<<<<<< ours
+=======
+    // 編集時は既存値を初期表示し、ユーザーの再入力負荷を減らす。
+>>>>>>> theirs
     const { data } = await stockApi.get(Number(route.params.id))
     form.name = data.name
     form.category = data.category || ''
     form.unit = data.unit
     form.currentStock = data.currentStock
     form.minimumStock = data.minimumStock
+<<<<<<< ours
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '在庫取得に失敗しました'
   }
 })
 
+=======
+  } catch (e: unknown) {
+    error.value = getErrorMessage(e, '在庫取得に失敗しました')
+  }
+})
+
+/**
+ * 作成/更新共通保存処理。
+ * MVPでは最小バリデーションに留め、詳細検証はバックエンド側と役割分担する。
+ */
+>>>>>>> theirs
 async function submit() {
   error.value = ''
   if (!form.name || !form.unit || form.currentStock < 0 || form.minimumStock < 0) {
@@ -76,8 +96,13 @@ async function submit() {
       await stockApi.create(form)
     }
     router.push('/stocks')
+<<<<<<< ours
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '保存に失敗しました'
+=======
+  } catch (e: unknown) {
+    error.value = getErrorMessage(e, '保存に失敗しました')
+>>>>>>> theirs
   }
 }
 </script>

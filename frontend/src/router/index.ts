@@ -60,6 +60,10 @@ router.beforeEach(async (to) => {
 
 async function safeFetchGroup(groupStore: ReturnType<typeof useGroupStore>) {
   try {
+<<<<<<< ours
+=======
+    // guard内の判定元を統一し、画面ごとの個別判定による分岐ブレを防ぐ。
+>>>>>>> theirs
     await groupStore.fetchMyGroup()
   } catch {
     groupStore.reset()

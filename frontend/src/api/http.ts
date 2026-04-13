@@ -20,6 +20,10 @@ http.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+<<<<<<< ours
+=======
+      // 認証切れ時は不正状態を残さずログインへ戻し、保護画面アクセスを防ぐ。
+>>>>>>> theirs
       localStorage.removeItem('accessToken')
       localStorage.removeItem('authUser')
       window.location.href = '/login'

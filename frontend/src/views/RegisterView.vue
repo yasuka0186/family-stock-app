@@ -22,6 +22,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+<<<<<<< ours
+=======
+import { getErrorMessage } from '../utils/error'
+>>>>>>> theirs
 
 /**
  * ユーザー登録画面。
@@ -40,11 +44,20 @@ async function submit() {
   error.value = ''
   success.value = ''
   try {
+<<<<<<< ours
     await authStore.register(name.value, email.value, password.value)
     success.value = '登録しました。ログインしてください。'
     setTimeout(() => router.push('/login'), 500)
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '登録に失敗しました'
+=======
+    // MVPでは登録とログインを分離し、失敗時の切り分けを簡単にする。
+    await authStore.register(name.value, email.value, password.value)
+    success.value = '登録しました。ログインしてください。'
+    setTimeout(() => router.push('/login'), 500)
+  } catch (e: unknown) {
+    error.value = getErrorMessage(e, '登録に失敗しました')
+>>>>>>> theirs
   }
 }
 </script>

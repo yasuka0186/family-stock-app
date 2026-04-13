@@ -20,6 +20,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useGroupStore } from '../stores/group'
+<<<<<<< ours
+=======
+import { getErrorMessage } from '../utils/error'
+>>>>>>> theirs
 
 /**
  * ログイン画面。
@@ -36,11 +40,20 @@ const error = ref('')
 async function submit() {
   error.value = ''
   try {
+<<<<<<< ours
     await authStore.login(email.value, password.value)
     await groupStore.fetchMyGroup()
     router.push(groupStore.hasGroup ? '/stocks' : '/group-setup')
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? 'ログインに失敗しました'
+=======
+    // 認証成功時点で所属状態を確認し、最短で使える画面へ遷移する。
+    await authStore.login(email.value, password.value)
+    await groupStore.fetchMyGroup()
+    router.push(groupStore.hasGroup ? '/stocks' : '/group-setup')
+  } catch (e: unknown) {
+    error.value = getErrorMessage(e, 'ログインに失敗しました')
+>>>>>>> theirs
   }
 }
 </script>

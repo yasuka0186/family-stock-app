@@ -23,6 +23,10 @@
 import { ref } from 'vue'
 import { stockApi } from '../api/stock'
 import type { StockItem, StockUpdateMode, StockUpdateReason } from '../types/stock'
+<<<<<<< ours
+=======
+import { getErrorMessage } from '../utils/error'
+>>>>>>> theirs
 
 /**
  * 在庫数更新UI。
@@ -44,14 +48,25 @@ async function submit() {
   }
 
   try {
+<<<<<<< ours
+=======
+    // サーバー側の自動買い物リスト連携ロジックを活かすため、更新APIを必ず経由する。
+>>>>>>> theirs
     await stockApi.updateStock(props.item.id, {
       mode: mode.value,
       quantity: quantity.value,
       reason: reason.value || undefined
     })
+<<<<<<< ours
     emit('updated')
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? '在庫更新に失敗しました'
+=======
+    // 親で一覧再取得して表示整合を取るため、更新イベントのみ通知する。
+    emit('updated')
+  } catch (e: unknown) {
+    error.value = getErrorMessage(e, '在庫更新に失敗しました')
+>>>>>>> theirs
   }
 }
 </script>

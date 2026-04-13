@@ -7,7 +7,10 @@ import com.familystock.backend.dto.response.auth.RegisterResponse;
 import com.familystock.backend.dto.response.auth.UserSummaryResponse;
 
 /**
+<<<<<<< ours
 
+=======
+>>>>>>> theirs
  * 認証ユースケースを扱うサービス。
  * register/login/me の最小業務ロジックを提供する。
  */
